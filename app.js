@@ -8,27 +8,46 @@ $(document).ready(function () {
         }
 
         addToDOM() {
-            var inlineHtml = `<h3>Click Count</h3>
-            <p id='${this.name}'>0</p>
-            <figure id='${this.name + "Figure"}'>
-                <img src="${this.pictureUrl}" alt="${this.name}" width="300">
-            </figure>`
+            var element = document.createElement('button');
+            element.className = 'list-group-item';
+            element.type = 'button';
+            element.innerText = this.name;
 
-            const container = document.querySelector('#cats');
-            container.insertAdjacentHTML('afterbegin', inlineHtml);
+            function getCat(cat) {
+                if (cat.name === this) {
+                    return cat;
+                }
+            }
 
-            $('#' + this.name + 'Figure').click(function () {
+            element.addEventListener('click', function () {
+                const catContainer = document.querySelector('#catDetailsContainer');
+                while (catContainer.firstChild) {
+                    catContainer.removeChild(catContainer.firstChild);
+                }
 
-                cats.forEach(element => {
-                    if (element.name + 'Figure' === this.id) {
-                        var text = $('#' + element.name);
-                        element.clickCount++;
-                        text.text(element.clickCount);
-                    }
+                var foundCat = cats.find(getCat, this.textContent);
+                var counter = document.createElement('p');
+                counter.id = this.textContent + 'Image';
+                counter.innerText = foundCat.clickCount;
+                catContainer.appendChild(counter);
+
+                var catImage = document.createElement('img');
+                catImage.src = foundCat.pictureUrl;
+                catImage.alt = foundCat.name;
+                catImage.width = 200;
+
+                catImage.addEventListener('click', function () {
+                    let foundCat = cats.find(getCat, this.alt);
+                    foundCat.clickCount++;
+                    let counter = document.querySelector('#'+foundCat.name+'Image');
+                    counter.textContent = foundCat.clickCount;
                 });
-                
-            });
 
+                catContainer.appendChild(catImage);
+
+            });
+            const container = document.querySelector('#catList');
+            container.appendChild(element);
             cats.push(this);
         }
 
@@ -37,10 +56,17 @@ $(document).ready(function () {
     cats = [];
 
     poplinre = new Cat('poplinre', 'img/poplinre.jpg', 0);
-
     poplinre.addToDOM();
 
     chewie = new Cat('chewie', 'img/chewie.jpg', 0);
-
     chewie.addToDOM();
+
+    jetske = new Cat('jetske', 'img/jetske.jpg', 0);
+    jetske.addToDOM();
+
+    whiteKittenonPinkThrow = new Cat('whiteKittenonPinkThrow', 'img/whiteKittenonPinkThrow.jpeg', 0);
+    whiteKittenonPinkThrow.addToDOM();
+
+    youngKitten = new Cat('youngKitten', 'img/youngKitten.jpg', 0);
+    youngKitten.addToDOM();
 });
