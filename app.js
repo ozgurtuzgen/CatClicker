@@ -1,72 +1,121 @@
-$(document).ready(function () {
+$(function () {
 
-    class Cat {
-        constructor(name, pictureUrl, clickCount) {
-            this.name = name;
-            this.pictureUrl = pictureUrl;
-            this.clickCount = clickCount;
+    var model = {
+
+        Cat: class {
+            constructor(name, pictureUrl, clickCount) {
+                this.name = name;
+                this.pictureUrl = pictureUrl;
+                this.clickCount = clickCount;
+            }
+        },
+
+        cats: [],
+
+        selectedCat: undefined,
+
+        initCats: function () {
+            poplinre = new model.Cat('poplinre', 'img/poplinre.jpg', 0);
+            chewie = new model.Cat('chewie', 'img/chewie.jpg', 0);
+            jetske = new model.Cat('jetske', 'img/jetske.jpg', 0);
+            whiteKittenonPinkThrow = new model.Cat('whiteKittenonPinkThrow', 'img/whiteKittenonPinkThrow.jpeg', 0);
+            youngKitten = new model.Cat('youngKitten', 'img/youngKitten.jpg', 0);
+
+            model.cats.push(poplinre);
+            model.cats.push(chewie);
+            model.cats.push(jetske);
+            model.cats.push(whiteKittenonPinkThrow);
+            model.cats.push(youngKitten);
         }
+    };
 
-        addToDOM() {
-            var element = document.createElement('button');
-            element.className = 'list-group-item';
-            element.type = 'button';
-            element.innerText = this.name;
+    var catListView = {
+        init: function () {
+            this.catListContainer = document.querySelector('#catList');
+            catListView.render();
+        },
 
-            function getCat(cat) {
-                if (cat.name === this) {
-                    return cat;
-                }
+        render: function () {
+            octopus.getCats().forEach(catItem => {
+                var element = document.createElement('button');
+                element.className = 'list-group-item';
+                element.type = 'button';
+                element.innerText = catItem.name;
+                element.addEventListener('click', (function (catItemCopy) {
+                    return function () {
+                        octopus.setSelectedCat(catItemCopy);
+                    };
+
+                })(catItem));
+
+                this.catListContainer.appendChild(element);
+            });
+
+        }
+    };
+
+    var catDetailView = {
+        init: function () {
+            this.catDetailsContainer = document.querySelector('#catDetailsContainer');
+            catDetailView.render();
+        },
+
+        render: function () {
+
+            let selectedCat = octopus.getSelectedCat();
+
+            while (this.catDetailsContainer.firstChild) {
+                this.catDetailsContainer.removeChild(this.catDetailsContainer.firstChild);
             }
 
-            element.addEventListener('click', function () {
-                const catContainer = document.querySelector('#catDetailsContainer');
-                while (catContainer.firstChild) {
-                    catContainer.removeChild(catContainer.firstChild);
-                }
+            var counter = document.createElement('p');
+            counter.id = selectedCat.name + 'Image';
+            counter.innerText = selectedCat.clickCount;
+            this.catDetailsContainer.appendChild(counter);
 
-                var foundCat = cats.find(getCat, this.textContent);
-                var counter = document.createElement('p');
-                counter.id = this.textContent + 'Image';
-                counter.innerText = foundCat.clickCount;
-                catContainer.appendChild(counter);
+            var catImage = document.createElement('img');
+            catImage.src = selectedCat.pictureUrl;
+            catImage.alt = selectedCat.name;
+            catImage.width = 200;
 
-                var catImage = document.createElement('img');
-                catImage.src = foundCat.pictureUrl;
-                catImage.alt = foundCat.name;
-                catImage.width = 200;
-
-                catImage.addEventListener('click', function () {
-                    let foundCat = cats.find(getCat, this.alt);
-                    foundCat.clickCount++;
-                    let counter = document.querySelector('#'+foundCat.name+'Image');
-                    counter.textContent = foundCat.clickCount;
-                });
-
-                catContainer.appendChild(catImage);
-
+            catImage.addEventListener('click', function () {
+                let selectedCat = octopus.getSelectedCat();
+                octopus.incrementClickCount();
+                let counter = document.querySelector('#' + selectedCat.name + 'Image');
+                counter.textContent = selectedCat.clickCount;
             });
-            const container = document.querySelector('#catList');
-            container.appendChild(element);
-            cats.push(this);
+
+            this.catDetailsContainer.appendChild(catImage);
         }
+    };
 
-    }
+    var octopus = {
+        init: function () {
+            model.initCats();
+            catListView.init();
+        },
 
-    cats = [];
+        getCats: function () {
+            return model.cats;
+        },
 
-    poplinre = new Cat('poplinre', 'img/poplinre.jpg', 0);
-    poplinre.addToDOM();
+        setSelectedCat: function (selectedCat) {
+            model.selectedCat = selectedCat;
+            catDetailView.init();
+        },
 
-    chewie = new Cat('chewie', 'img/chewie.jpg', 0);
-    chewie.addToDOM();
+        getSelectedCat: function () {
+            if (!model.selectedCat) {
+                throw Error("Cat Selection Error!");
+            }
+            return model.selectedCat;
+        },
 
-    jetske = new Cat('jetske', 'img/jetske.jpg', 0);
-    jetske.addToDOM();
+        incrementClickCount: function () {
+            model.selectedCat.clickCount++;
+        }
+    };
 
-    whiteKittenonPinkThrow = new Cat('whiteKittenonPinkThrow', 'img/whiteKittenonPinkThrow.jpeg', 0);
-    whiteKittenonPinkThrow.addToDOM();
+    octopus.init();
 
-    youngKitten = new Cat('youngKitten', 'img/youngKitten.jpg', 0);
-    youngKitten.addToDOM();
 });
