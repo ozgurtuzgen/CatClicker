@@ -63,9 +63,7 @@ $(function () {
             this.counter = document.querySelector('#counter');
             this.catImage = document.querySelector('#catImage');
             this.catImage.addEventListener('click', function () {
-                let selectedCat = octopus.getSelectedCat();
                 octopus.incrementClickCount();
-                catDetailView.render();
             });
 
             catDetailView.render();
@@ -103,6 +101,7 @@ $(function () {
 
         incrementClickCount: function () {
             model.selectedCat.clickCount++;
+            catDetailView.render();
         }
     };
 
