@@ -1,0 +1,7 @@
+.readonly {
+    visibility: hidden
+}
+
+.adminmode {
+    visibility: visible
+}

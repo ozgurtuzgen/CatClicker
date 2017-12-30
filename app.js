@@ -28,7 +28,21 @@ $(function () {
             model.cats.push(youngKitten);
 
             model.selectedCat = model.cats[0];
+        },
+
+        saveCat: function (name, url, counter) {
+            for (let index = 0; index < model.cats.length; index++) {
+                const element = model.cats[index];
+
+                if (element.name === model.selectedCat.name){
+                    element.name = name;
+                    element.clickCount = counter;
+                    element.pictureUrl = url;
+                    model.selectedCat = element;
+                }                
+            } 
         }
+
     };
 
     var catListView = {
@@ -38,6 +52,7 @@ $(function () {
         },
 
         render: function () {
+            this.catListContainer.innerHTML = '';
             octopus.getCats().forEach(catItem => {
                 var element = document.createElement('button');
                 element.className = 'list-group-item';
@@ -76,11 +91,49 @@ $(function () {
         }
     };
 
+    var adminView = {
+        init: function () {
+            this.adminButton = document.querySelector('#adminButton');
+            this.adminContainer = document.querySelector('#adminContainer');
+            this.adminName = document.querySelector('#adminName');
+            this.adminImgUrl = document.querySelector('#adminImgUrl');
+            this.adminCounter = document.querySelector('#adminCounter');
+            this.adminSave = document.querySelector('#adminSave');
+            this.adminCancel = document.querySelector('#adminCancel');
+            this.adminButton.addEventListener('click', function () {
+
+                adminContainer.className = 'adminmode';
+                adminView.render();
+            });
+            this.adminCancel.addEventListener('click', function () {
+                adminView.close();
+                adminContainer.className = 'readonly';
+            });
+            this.adminSave.addEventListener('click', function () {
+                octopus.saveCat(adminName.value, adminImgUrl.value, adminCounter.value);
+                adminView.close();
+            });
+        },
+        close: function () {
+            adminCounter.value = '';
+            adminImgUrl.value = '';
+            adminName.value = '';
+            adminContainer.className = 'readonly';
+        },
+        render: function () {
+            let selectedCat = octopus.getSelectedCat();
+            adminName.value = selectedCat.name;
+            adminImgUrl.value = selectedCat.pictureUrl;
+            adminCounter.value = selectedCat.clickCount;
+        }
+    }
+
     var octopus = {
         init: function () {
             model.initCats();
             catListView.init();
-            catDetailView.init();            
+            catDetailView.init();
+            adminView.init();
         },
 
         getCats: function () {
@@ -90,6 +143,7 @@ $(function () {
         setSelectedCat: function (selectedCat) {
             model.selectedCat = selectedCat;
             catDetailView.render();
+            adminView.render();
         },
 
         getSelectedCat: function () {
@@ -101,6 +155,13 @@ $(function () {
 
         incrementClickCount: function () {
             model.selectedCat.clickCount++;
+            catDetailView.render();
+            adminView.render();
+        },
+
+        saveCat: function (name, url, counter) {
+            model.saveCat(name,url, counter);
+            catListView.render();
             catDetailView.render();
         }
     };
