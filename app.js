@@ -26,6 +26,8 @@ $(function () {
             model.cats.push(jetske);
             model.cats.push(whiteKittenonPinkThrow);
             model.cats.push(youngKitten);
+
+            model.selectedCat = model.cats[0];
         }
     };
 
@@ -57,35 +59,22 @@ $(function () {
     var catDetailView = {
         init: function () {
             this.catDetailsContainer = document.querySelector('#catDetailsContainer');
+            this.catName = document.querySelector('#catName');
+            this.counter = document.querySelector('#counter');
+            this.catImage = document.querySelector('#catImage');
+            this.catImage.addEventListener('click', function () {
+                let selectedCat = octopus.getSelectedCat();
+                octopus.incrementClickCount();
+                catDetailView.render();
+            });
+
             catDetailView.render();
         },
 
         render: function () {
-
             let selectedCat = octopus.getSelectedCat();
-
-            while (this.catDetailsContainer.firstChild) {
-                this.catDetailsContainer.removeChild(this.catDetailsContainer.firstChild);
-            }
-
-            var counter = document.createElement('p');
-            counter.id = selectedCat.name + 'Image';
-            counter.innerText = selectedCat.clickCount;
-            this.catDetailsContainer.appendChild(counter);
-
-            var catImage = document.createElement('img');
-            catImage.src = selectedCat.pictureUrl;
-            catImage.alt = selectedCat.name;
-            catImage.width = 200;
-
-            catImage.addEventListener('click', function () {
-                let selectedCat = octopus.getSelectedCat();
-                octopus.incrementClickCount();
-                let counter = document.querySelector('#' + selectedCat.name + 'Image');
-                counter.textContent = selectedCat.clickCount;
-            });
-
-            this.catDetailsContainer.appendChild(catImage);
+            this.counter.innerText = selectedCat.clickCount;
+            this.catImage.src = selectedCat.pictureUrl;
         }
     };
 
@@ -93,6 +82,7 @@ $(function () {
         init: function () {
             model.initCats();
             catListView.init();
+            catDetailView.init();            
         },
 
         getCats: function () {
@@ -101,7 +91,7 @@ $(function () {
 
         setSelectedCat: function (selectedCat) {
             model.selectedCat = selectedCat;
-            catDetailView.init();
+            catDetailView.render();
         },
 
         getSelectedCat: function () {
